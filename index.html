@@ -22,10 +22,10 @@
             justify-content: center;
             padding: 20px;
             position: relative;
-            overflow-x: hidden;
+            overflow: hidden;
         }
 
-        .binary-bg {
+        .matrix-bg {
             position: fixed;
             top: 0;
             left: 0;
@@ -36,23 +36,33 @@
             overflow: hidden;
         }
 
-        .binary-code {
+        .matrix-code {
             position: absolute;
-            color: rgba(255, 255, 255, 0.2);
-            font-size: 12px;
+            color: rgba(0, 255, 0, 0.85);
+            font-size: 32px;
+            font-weight: bold;
             white-space: nowrap;
-            animation: float-down 20s linear infinite;
+            animation: matrix-fall 12s linear infinite;
+            text-shadow: 0 0 15px rgba(0, 255, 0, 1), 0 0 30px rgba(0, 255, 0, 0.7);
+            letter-spacing: 4px;
+            font-family: 'Courier New', monospace;
         }
 
-        @keyframes float-down {
-            from { transform: translateY(-100px); opacity: 0; }
-            50% { opacity: 0.3; }
-            to { transform: translateY(100vh); opacity: 0; }
+        @keyframes matrix-fall {
+            from { 
+                transform: translateY(-100vh); 
+                opacity: 1;
+            }
+            to { 
+                transform: translateY(100vh); 
+                opacity: 0.3;
+            }
         }
 
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes spin-reverse { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
         @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+        @keyframes glow { 0%, 100% { text-shadow: 0 0 20px rgba(255, 255, 255, 0.8); } 50% { text-shadow: 0 0 40px rgba(255, 255, 255, 1); } }
 
         .main-content {
             position: relative;
@@ -74,56 +84,59 @@
         .demon-img {
             width: 120px;
             height: 120px;
-            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
+            filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.8));
             animation: float 3s ease-in-out infinite;
         }
 
         .pentagram {
             width: 60px;
             height: 60px;
-            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.3));
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
         }
 
         .pentagram-left { animation: spin 8s linear infinite; }
         .pentagram-right { animation: spin-reverse 8s linear infinite; }
 
         h1 {
-            font-size: 32px;
-            letter-spacing: 3px;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
-            animation: float 2s ease-in-out infinite;
+            font-size: 36px;
+            letter-spacing: 4px;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 1);
+            animation: glow 2s ease-in-out infinite;
+            font-weight: bold;
         }
 
         .discord-link {
             border: 2px solid #ffffff;
-            padding: 12px 25px;
+            padding: 14px 30px;
             font-size: 16px;
             text-decoration: none;
             color: #ffffff;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             transition: all 0.3s ease;
             display: inline-block;
+            font-weight: bold;
         }
 
         .discord-link:hover {
-            background: rgba(255, 255, 255, 0.1);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
-            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.8);
+            transform: scale(1.08);
         }
 
         .form-container {
             margin-top: 20px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
             width: 100%;
             max-width: 400px;
         }
 
         .form-label {
-            font-size: 14px;
-            letter-spacing: 1px;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+            font-size: 16px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+            font-weight: bold;
         }
 
         .message-form {
@@ -133,55 +146,59 @@
         }
 
         .message-form input {
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.1);
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.08);
             border: 2px solid #ffffff;
             color: #ffffff;
             font-family: 'Courier New', monospace;
-            font-size: 14px;
+            font-size: 15px;
             outline: none;
-            transition: all 0.3s ease;
-        }
-
-        .message-form input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .message-form input:focus {
-            background: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
-        }
-
-        .message-form button {
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid #ffffff;
-            color: #ffffff;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            cursor: pointer;
             transition: all 0.3s ease;
             font-weight: bold;
         }
 
+        .message-form input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .message-form input:focus {
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .message-form button {
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid #ffffff;
+            color: #ffffff;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
         .message-form button:hover {
-            background: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
-            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+            transform: scale(1.08);
         }
 
         .success-message {
             color: #00ff00;
-            font-size: 14px;
+            font-size: 15px;
             display: none;
-            text-shadow: 0 0 10px rgba(0, 255, 0, 0.6);
+            text-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+            font-weight: bold;
         }
 
         .error-message {
             color: #ff0000;
-            font-size: 14px;
+            font-size: 15px;
             display: none;
-            text-shadow: 0 0 10px rgba(255, 0, 0, 0.6);
+            text-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
+            font-weight: bold;
         }
 
         audio { display: none; }
@@ -190,13 +207,14 @@
             .content-row { gap: 20px; }
             .pentagram { width: 50px; height: 50px; }
             .demon-img { width: 100px; height: 100px; }
-            h1 { font-size: 24px; }
+            h1 { font-size: 28px; }
             .message-form { max-width: 90vw; }
+            .matrix-code { font-size: 24px; }
         }
     </style>
 </head>
 <body>
-    <div class="binary-bg" id="binaryBg"></div>
+    <div class="matrix-bg" id="matrixBg"></div>
     <audio id="scaryAudio" loop volume="1.0">
         <source src="scary_sound.mp3" type="audio/mpeg">
     </audio>
@@ -224,23 +242,37 @@
     </div>
 
     <script>
-        // Binary background
-        const binaryCode = "01001000 01100101 01101100 01101100";
-        const binaryBg = document.getElementById('binaryBg');
+        // MATRIX RAIN - Código binário caindo GIGANTE
+        const binarySequences = [
+            "01001000 01100101 01101100 01101100",
+            "01001000 01100101 01101100 01101100",
+            "01001000 01100101 01101100 01101100",
+            "01001000 01100101 01101100 01101100",
+            "01001000 01100101 01101100 01101100"
+        ];
+        
+        const matrixBg = document.getElementById('matrixBg');
         const width = window.innerWidth;
         const height = window.innerHeight;
-        const spacing = 120;
-
-        for (let y = 0; y < height; y += spacing) {
-            for (let x = 0; x < width; x += spacing * 1.5) {
-                const binary = document.createElement('div');
-                binary.className = 'binary-code';
-                binary.textContent = binaryCode;
-                binary.style.left = x + 'px';
-                binary.style.top = y + 'px';
-                binary.style.animationDelay = (Math.random() * 20) + 's';
-                binaryBg.appendChild(binary);
-            }
+        
+        // Criar MUITAS linhas de código caindo
+        for (let i = 0; i < 50; i++) {
+            const code = document.createElement('div');
+            code.className = 'matrix-code';
+            code.textContent = binarySequences[Math.floor(Math.random() * binarySequences.length)];
+            
+            const randomX = Math.random() * width;
+            const randomDelay = Math.random() * 12;
+            const randomDuration = 10 + Math.random() * 8;
+            
+            code.style.left = randomX + 'px';
+            code.style.top = (Math.random() * height - height) + 'px';
+            code.style.animationDelay = randomDelay + 's';
+            code.style.animationDuration = randomDuration + 's';
+            code.style.fontSize = (28 + Math.random() * 16) + 'px';
+            code.style.opacity = (0.7 + Math.random() * 0.3);
+            
+            matrixBg.appendChild(code);
         }
 
         // Audio
