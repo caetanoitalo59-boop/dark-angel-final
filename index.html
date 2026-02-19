@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Angel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000000;
+            color: #ffffff;
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .binary-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .binary-code {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 12px;
+            white-space: nowrap;
+            animation: float-down 20s linear infinite;
+        }
+
+        @keyframes float-down {
+            from { transform: translateY(-100px); opacity: 0; }
+            50% { opacity: 0.3; }
+            to { transform: translateY(100vh); opacity: 0; }
+        }
+
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes spin-reverse { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+
+        .main-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .content-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .demon-img {
+            width: 120px;
+            height: 120px;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .pentagram {
+            width: 60px;
+            height: 60px;
+            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.3));
+        }
+
+        .pentagram-left { animation: spin 8s linear infinite; }
+        .pentagram-right { animation: spin-reverse 8s linear infinite; }
+
+        h1 {
+            font-size: 32px;
+            letter-spacing: 3px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+            animation: float 2s ease-in-out infinite;
+        }
+
+        .discord-link {
+            border: 2px solid #ffffff;
+            padding: 12px 25px;
+            font-size: 16px;
+            text-decoration: none;
+            color: #ffffff;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .discord-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+            transform: scale(1.05);
+        }
+
+        .form-container {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .form-label {
+            font-size: 14px;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+        }
+
+        .message-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message-form input {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #ffffff;
+            color: #ffffff;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .message-form input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .message-form input:focus {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+        }
+
+        .message-form button {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #ffffff;
+            color: #ffffff;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .message-form button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+            transform: scale(1.05);
+        }
+
+        .success-message {
+            color: #00ff00;
+            font-size: 14px;
+            display: none;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.6);
+        }
+
+        .error-message {
+            color: #ff0000;
+            font-size: 14px;
+            display: none;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.6);
+        }
+
+        audio { display: none; }
+
+        @media (max-width: 768px) {
+            .content-row { gap: 20px; }
+            .pentagram { width: 50px; height: 50px; }
+            .demon-img { width: 100px; height: 100px; }
+            h1 { font-size: 24px; }
+            .message-form { max-width: 90vw; }
+        }
+    </style>
+</head>
+<body>
+    <div class="binary-bg" id="binaryBg"></div>
+    <audio id="scaryAudio" loop volume="1.0">
+        <source src="scary_sound.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="main-content">
+        <div class="content-row">
+            <img src="pentagram.gif" alt="Pentagram" class="pentagram pentagram-left">
+            <img src="demon.png" alt="Demon" class="demon-img">
+            <img src="pentagram.gif" alt="Pentagram" class="pentagram pentagram-right">
+        </div>
+
+        <h1>VOCE VIU ESSE ANJO¿</h1>
+
+        <a href="https://discord.gg/vv00" class="discord-link" target="_blank">discord.gg/vv00</a>
+
+        <div class="form-container">
+            <div class="form-label">REALIZE UM PEDIDO</div>
+            <form class="message-form" id="messageForm">
+                <input type="text" id="messageInput" placeholder="Escreva sua mensagem..." required>
+                <button type="submit">ENVIAR</button>
+            </form>
+            <div class="success-message" id="successMessage">✓ Mensagem enviada!</div>
+            <div class="error-message" id="errorMessage">✗ Erro ao enviar</div>
+        </div>
+    </div>
+
+    <script>
+        // Binary background
+        const binaryCode = "01001000 01100101 01101100 01101100";
+        const binaryBg = document.getElementById('binaryBg');
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const spacing = 120;
+
+        for (let y = 0; y < height; y += spacing) {
+            for (let x = 0; x < width; x += spacing * 1.5) {
+                const binary = document.createElement('div');
+                binary.className = 'binary-code';
+                binary.textContent = binaryCode;
+                binary.style.left = x + 'px';
+                binary.style.top = y + 'px';
+                binary.style.animationDelay = (Math.random() * 20) + 's';
+                binaryBg.appendChild(binary);
+            }
+        }
+
+        // Audio
+        const audio = document.getElementById('scaryAudio');
+        let audioStarted = false;
+
+        function playAudio() {
+            if (!audioStarted) {
+                audio.volume = 1.0;
+                audio.play().catch(err => console.log('Audio play error:', err));
+                audioStarted = true;
+            }
+        }
+
+        document.addEventListener('click', playAudio);
+        document.addEventListener('touchstart', playAudio);
+        setTimeout(playAudio, 1000);
+
+        // Webhook
+        const WEBHOOK_URL = 'https://discord.com/api/webhooks/1474145387638948108/y7QjQaCCR8W_ZS2hCv_LlnAQdf2gW4lI9uv5LV3N9xgVJ5N8tim-wyjVAzQ-OruQEwdw';
+        const messageForm = document.getElementById('messageForm');
+        const messageInput = document.getElementById('messageInput');
+        const successMessage = document.getElementById('successMessage');
+        const errorMessage = document.getElementById('errorMessage');
+
+        messageForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            try {
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: message, username: 'Dark Angel' })
+                });
+
+                if (response.ok) {
+                    successMessage.style.display = 'block';
+                    errorMessage.style.display = 'none';
+                    messageInput.value = '';
+                    setTimeout(() => { successMessage.style.display = 'none'; }, 3000);
+                } else {
+                    throw new Error('Erro ao enviar');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                errorMessage.style.display = 'block';
+                successMessage.style.display = 'none';
+                setTimeout(() => { errorMessage.style.display = 'none'; }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
