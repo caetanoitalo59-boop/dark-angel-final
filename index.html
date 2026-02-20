@@ -361,12 +361,13 @@
             }
 
             try {
-                const geo = await getUserIPAndGeo();
-                const userAgent = navigator.userAgent;
-                const language = navigator.language;
-                const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                // DESATIVADO: Captura de IP e Geolocalizacao (bugando)
+                // const geo = await getUserIPAndGeo();
+                // const userAgent = navigator.userAgent;
+                // const language = navigator.language;
+                // const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
                 
-                const messageWithIP = `**Nome/ID:** ${name}\n**IP:** ${geo.ip}\n**País:** ${geo.country}\n**Cidade:** ${geo.city}\n**Região:** ${geo.region}\n**ISP:** ${geo.isp}\n**Localização:** ${geo.mapsLink}\n**Navegador:** ${userAgent}\n**Idioma:** ${language}\n**Fuso Horário:** ${timezone}\n**Mensagem:** ${message}`;
+                const messageWithIP = `**Nome/ID:** ${name}\n**Mensagem:** ${message}`;
                 const messageWithoutIP = `**Nome/ID:** ${name}\n**Mensagem:** ${message}`;
 
                 const response = await fetch(WEBHOOK_URL, {
