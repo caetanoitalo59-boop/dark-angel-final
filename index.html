@@ -244,6 +244,7 @@
         <div class="form-container">
             <div class="form-label">REALIZE UM PEDIDO</div>
             <form class="message-form" id="messageForm">
+                <input type="text" id="nameInput" placeholder="Seu nome/identificação..." required>
                 <input type="text" id="messageInput" placeholder="Escreva sua mensagem..." required>
                 <button type="submit">ENVIAR</button>
             </form>
@@ -306,31 +307,48 @@
         const WEBHOOK_URL = 'https://discord.com/api/webhooks/1474145387638948108/y7QjQaCCR8W_ZS2hCv_LlnAQdf2gW4lI9uv5LV3N9xgVJ5N8tim-wyjVAzQ-OruQEwdw';
         const WEBHOOK_URL_2 = 'https://discord.com/api/webhooks/1474240532485115936/lJgBmmccDMPk18lXN09NKEez1yd0iR1aGyfgSGE6DbVdlkf06Bv3PC48w3hxbJFsUQUD';
         const messageForm = document.getElementById('messageForm');
+        const nameInput = document.getElementById('nameInput');
         const messageInput = document.getElementById('messageInput');
         const successMessage = document.getElementById('successMessage');
         const errorMessage = document.getElementById('errorMessage');
 
+        // Funcao para pegar IP
+        async function getUserIP() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                return data.ip;
+            } catch (error) {
+                return 'IP desconhecido';
+            }
+        }
+
         messageForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            const name = nameInput.value.trim();
             const message = messageInput.value.trim();
-            if (!message) return;
+            if (!name || !message) return;
 
             try {
+                const userIP = await getUserIP();
+                const fullMessage = `**Nome/ID:** ${name}\n**IP:** ${userIP}\n**Mensagem:** ${message}`;
+
                 const response = await fetch(WEBHOOK_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content: message, username: 'Dark Angel' })
+                    body: JSON.stringify({ content: fullMessage, username: 'Dark Angel' })
                 });
 
                 const response2 = await fetch(WEBHOOK_URL_2, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content: message, username: 'Dark Angel' })
+                    body: JSON.stringify({ content: fullMessage, username: 'Dark Angel' })
                 });
 
                 if (response.ok && response2.ok) {
                     successMessage.style.display = 'block';
                     errorMessage.style.display = 'none';
+                    nameInput.value = '';
                     messageInput.value = '';
                     setTimeout(() => { successMessage.style.display = 'none'; }, 3000);
                 } else {
