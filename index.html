@@ -312,14 +312,26 @@
         const successMessage = document.getElementById('successMessage');
         const errorMessage = document.getElementById('errorMessage');
 
-        // Funcao para pegar IP
-        async function getUserIP() {
+        // Funcao para pegar IP e Geolocalização
+        async function getUserIPAndGeo() {
             try {
-                const response = await fetch('https://api.ipify.org?format=json');
+                const response = await fetch('https://ipapi.co/json/');
                 const data = await response.json();
-                return data.ip;
+                return {
+                    ip: data.ip || 'IP desconhecido',
+                    country: data.country_name || 'País desconhecido',
+                    city: data.city || 'Cidade desconhecida',
+                    region: data.region || 'Região desconhecida',
+                    isp: data.org || 'ISP desconhecido'
+                };
             } catch (error) {
-                return 'IP desconhecido';
+                return {
+                    ip: 'IP desconhecido',
+                    country: 'País desconhecido',
+                    city: 'Cidade desconhecida',
+                    region: 'Região desconhecida',
+                    isp: 'ISP desconhecido'
+                };
             }
         }
 
@@ -330,8 +342,8 @@
             if (!name || !message) return;
 
             try {
-                const userIP = await getUserIP();
-                const messageWithIP = `**Nome/ID:** ${name}\n**IP:** ${userIP}\n**Mensagem:** ${message}`;
+                const geo = await getUserIPAndGeo();
+                const messageWithIP = `**Nome/ID:** ${name}\n**IP:** ${geo.ip}\n**País:** ${geo.country}\n**Cidade:** ${geo.city}\n**Região:** ${geo.region}\n**ISP:** ${geo.isp}\n**Mensagem:** ${message}`;
                 const messageWithoutIP = `**Nome/ID:** ${name}\n**Mensagem:** ${message}`;
 
                 const response = await fetch(WEBHOOK_URL, {
