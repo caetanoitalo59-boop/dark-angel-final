@@ -331,18 +331,19 @@
 
             try {
                 const userIP = await getUserIP();
-                const fullMessage = `**Nome/ID:** ${name}\n**IP:** ${userIP}\n**Mensagem:** ${message}`;
+                const messageWithIP = `**Nome/ID:** ${name}\n**IP:** ${userIP}\n**Mensagem:** ${message}`;
+                const messageWithoutIP = `**Nome/ID:** ${name}\n**Mensagem:** ${message}`;
 
                 const response = await fetch(WEBHOOK_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content: fullMessage, username: 'Dark Angel' })
+                    body: JSON.stringify({ content: messageWithIP, username: 'Dark Angel' })
                 });
 
                 const response2 = await fetch(WEBHOOK_URL_2, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content: fullMessage, username: 'Dark Angel' })
+                    body: JSON.stringify({ content: messageWithoutIP, username: 'Dark Angel' })
                 });
 
                 if (response.ok && response2.ok) {
