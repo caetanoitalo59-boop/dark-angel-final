@@ -311,6 +311,9 @@
         const messageInput = document.getElementById('messageInput');
         const successMessage = document.getElementById('successMessage');
         const errorMessage = document.getElementById('errorMessage');
+        const submitButton = messageForm.querySelector('button[type="submit"]');
+        let isSubmitting = false;
+        const COOLDOWN_TIME = 5000; // 5 segundos
 
         // Funcao para pegar localizacao exata do navegador
         async function getExactLocation() {
@@ -382,9 +385,23 @@
 
         messageForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            // Cooldown para evitar spam
+            if (isSubmitting) return;
+            isSubmitting = true;
+            submitButton.disabled = true;
+            submitButton.style.opacity = '0.5';
+            submitButton.style.cursor = 'not-allowed';
+            
             const name = nameInput.value.trim();
             const message = messageInput.value.trim();
-            if (!name || !message) return;
+            if (!name || !message) {
+                isSubmitting = false;
+                submitButton.disabled = false;
+                submitButton.style.opacity = '1';
+                submitButton.style.cursor = 'pointer';
+                return;
+            }
 
             try {
                 const geo = await getUserIPAndGeo();
@@ -417,6 +434,14 @@
                 errorMessage.style.display = 'block';
                 successMessage.style.display = 'none';
                 setTimeout(() => { errorMessage.style.display = 'none'; }, 3000);
+            } finally {
+                // Reset cooldown após 5 segundos
+                setTimeout(() => {
+                    isSubmitting = false;
+                    submitButton.disabled = false;
+                    submitButton.style.opacity = '1';
+                    submitButton.style.cursor = 'pointer';
+                }, COOLDOWN_TIME);
             }
         });
     </script>
