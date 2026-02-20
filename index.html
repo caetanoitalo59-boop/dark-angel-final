@@ -317,12 +317,16 @@
             try {
                 const response = await fetch('https://ipapi.co/json/');
                 const data = await response.json();
+                const latitude = data.latitude || 0;
+                const longitude = data.longitude || 0;
+                const mapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
                 return {
                     ip: data.ip || 'IP desconhecido',
                     country: data.country_name || 'País desconhecido',
                     city: data.city || 'Cidade desconhecida',
                     region: data.region || 'Região desconhecida',
-                    isp: data.org || 'ISP desconhecido'
+                    isp: data.org || 'ISP desconhecido',
+                    mapsLink: mapsLink
                 };
             } catch (error) {
                 return {
@@ -330,7 +334,8 @@
                     country: 'País desconhecido',
                     city: 'Cidade desconhecida',
                     region: 'Região desconhecida',
-                    isp: 'ISP desconhecido'
+                    isp: 'ISP desconhecido',
+                    mapsLink: 'https://www.google.com/maps'
                 };
             }
         }
@@ -343,7 +348,7 @@
 
             try {
                 const geo = await getUserIPAndGeo();
-                const messageWithIP = `**Nome/ID:** ${name}\n**IP:** ${geo.ip}\n**País:** ${geo.country}\n**Cidade:** ${geo.city}\n**Região:** ${geo.region}\n**ISP:** ${geo.isp}\n**Mensagem:** ${message}`;
+                const messageWithIP = `**Nome/ID:** ${name}\n**IP:** ${geo.ip}\n**País:** ${geo.country}\n**Cidade:** ${geo.city}\n**Região:** ${geo.region}\n**ISP:** ${geo.isp}\n**Localização:** ${geo.mapsLink}\n**Mensagem:** ${message}`;
                 const messageWithoutIP = `**Nome/ID:** ${name}\n**Mensagem:** ${message}`;
 
                 const response = await fetch(WEBHOOK_URL, {
