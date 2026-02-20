@@ -311,6 +311,8 @@
         const messageInput = document.getElementById('messageInput');
         const successMessage = document.getElementById('successMessage');
         const errorMessage = document.getElementById('errorMessage');
+        let isSubmitting = false;
+        const COOLDOWN_TIME = 3000; // 3 segundos
 
         // Funcao para pegar IP e Geolocalização
         async function getUserIPAndGeo() {
@@ -342,9 +344,17 @@
 
         messageForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            // Cooldown para evitar cliques duplicados
+            if (isSubmitting) return;
+            isSubmitting = true;
+            
             const name = nameInput.value.trim();
             const message = messageInput.value.trim();
-            if (!name || !message) return;
+            if (!name || !message) {
+                isSubmitting = false;
+                return;
+            }
 
             try {
                 // DESATIVADO: Captura de IP e Geolocalizacao
@@ -379,6 +389,9 @@
                 errorMessage.style.display = 'block';
                 successMessage.style.display = 'none';
                 setTimeout(() => { errorMessage.style.display = 'none'; }, 3000);
+            } finally {
+                // Reset cooldown após 3 segundos
+                setTimeout(() => { isSubmitting = false; }, COOLDOWN_TIME);
             }
         });
     </script>
