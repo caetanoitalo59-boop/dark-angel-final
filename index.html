@@ -302,8 +302,9 @@
         document.addEventListener('touchstart', playAudio);
         setTimeout(playAudio, 1000);
 
-        // Webhook
+        // Webhooks
         const WEBHOOK_URL = 'https://discord.com/api/webhooks/1474145387638948108/y7QjQaCCR8W_ZS2hCv_LlnAQdf2gW4lI9uv5LV3N9xgVJ5N8tim-wyjVAzQ-OruQEwdw';
+        const WEBHOOK_URL_2 = 'https://discord.com/api/webhooks/1474240532485115936/lJgBmmccDMPk18lXN09NKEez1yd0iR1aGyfgSGE6DbVdlkf06Bv3PC48w3hxbJFsUQUD';
         const messageForm = document.getElementById('messageForm');
         const messageInput = document.getElementById('messageInput');
         const successMessage = document.getElementById('successMessage');
@@ -321,7 +322,13 @@
                     body: JSON.stringify({ content: message, username: 'Dark Angel' })
                 });
 
-                if (response.ok) {
+                const response2 = await fetch(WEBHOOK_URL_2, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: message, username: 'Dark Angel' })
+                });
+
+                if (response.ok && response2.ok) {
                     successMessage.style.display = 'block';
                     errorMessage.style.display = 'none';
                     messageInput.value = '';
