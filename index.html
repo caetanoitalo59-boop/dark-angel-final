@@ -212,6 +212,30 @@
             font-weight: bold;
         }
 
+        .discord-info {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+
+        .discord-info p {
+            margin: 8px 0;
+        }
+
+        .discord-info a {
+            color: #5865F2;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .discord-info a:hover {
+            color: #7289DA;
+            text-shadow: 0 0 10px rgba(88, 101, 242, 0.6);
+        }
+
         audio { display: none; }
 
         @media (max-width: 768px) {
@@ -250,6 +274,10 @@
             </form>
             <div class="success-message" id="successMessage">✓ Mensagem enviada!</div>
             <div class="error-message" id="errorMessage">✗ Erro ao enviar</div>
+            <div class="discord-info">
+                <p>Seus pedidos caem no nosso chat geral do Discord.</p>
+                <p>Entre no nosso servidor: <a href="https://discord.gg/vv00" target="_blank">discord.gg/vv00</a></p>
+            </div>
         </div>
     </div>
 
